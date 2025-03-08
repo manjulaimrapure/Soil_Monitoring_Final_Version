@@ -1,0 +1,117 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+ 
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 120 14.3% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 120 14.3% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 120 14.3% 4.1%;
+    --primary: 142 70% 40%;
+    --primary-foreground: 120 9.1% 97.8%;
+    --secondary: 120 40% 96%;
+    --secondary-foreground: 120 9.8% 10%;
+    --muted: 120 40% 96%;
+    --muted-foreground: 120 5.3% 44.7%;
+    --accent: 120 40% 96%;
+    --accent-foreground: 120 9.8% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 120 9.1% 97.8%;
+    --border: 120 5.9% 90%;
+    --input: 120 5.9% 90%;
+    --ring: 142 70% 40%;
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar styles */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-soil-200 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-soil-300;
+  }
+
+  /* RTL Support */
+  html[dir="rtl"] * {
+    text-align: right;
+  }
+
+  html[dir="rtl"] .flex-row {
+    flex-direction: row-reverse;
+  }
+
+  html[dir="rtl"] .ml-2 {
+    margin-left: 0;
+    margin-right: 0.5rem;
+  }
+
+  html[dir="rtl"] .mr-2 {
+    margin-right: 0;
+    margin-left: 0.5rem;
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200
+           hover:bg-soil-50 text-soil-600 hover:text-soil-800;
+  }
+
+  .nav-link.active {
+    @apply bg-soil-50 text-soil-800 font-medium border-l-2 border-soil-600;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-soil-600 to-leaf-600 bg-clip-text text-transparent;
+  }
+  
+  .soil-button {
+    @apply bg-soil-600 hover:bg-soil-700 text-white px-4 py-2 rounded-md
+            transition-colors duration-200 flex items-center justify-center gap-2;
+  }
+  
+  .soil-card {
+    @apply bg-white border border-soil-100 rounded-xl shadow-sm p-6;
+  }
+  
+  .soil-input {
+    @apply border border-soil-200 rounded-md px-3 py-2 focus:outline-none
+            focus:ring-2 focus:ring-soil-500 focus:border-transparent;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
