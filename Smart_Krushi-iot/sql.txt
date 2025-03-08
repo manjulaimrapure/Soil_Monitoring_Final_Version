@@ -1,0 +1,16 @@
+CREATE DATABASE sensor_data;
+
+USE sensor_data;
+
+CREATE TABLE readings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    moisture FLOAT NOT NULL,
+    temperatureC FLOAT NOT NULL,
+    temperatureF FLOAT NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE readings 
+ADD COLUMN nitrogen FLOAT NOT NULL, 
+ADD COLUMN phosphorus FLOAT NOT NULL, 
+ADD COLUMN potassium FLOAT NOT NULL;

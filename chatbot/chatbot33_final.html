@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartKrishi AI</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-image: url("https://flowlogic.software/wp-content/uploads/2021/02/green-gradient-transparent.png.png");
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    header {
+      background-color: #e0e0e0;
+      padding: 20px;
+      border-radius: 10px 10px 0 0;
+    }
+    h1 {
+      margin: 0;
+      color: #333;
+      font-size: 32px;
+    }
+    .subtitle {
+      color: #555;
+      margin-top: 5px;
+    }
+    .chat-container {
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    .chat-header {
+      background-color: #4a8f40;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chat-header h2 {
+      margin: 0;
+      font-weight: 500;
+    }
+    .status {
+      display: flex;
+      align-items: center;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background-color: #8fce00;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    .chat-messages {
+      padding: 20px;
+      min-height: 300px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    .message {
+      margin-bottom: 20px;
+      max-width: 80%;
+    }
+    .message.assistant {
+      margin-right: auto;
+    }
+    .message.user {
+      margin-left: auto;
+      color: rgb(0, 0, 0);
+      padding: 12px 15px;
+      border-radius: 18px;
+    }
+    .message-content {
+      background-color: #f5f5f5;
+      padding: 12px 15px;
+      border-radius: 18px;
+    }
+    .message-time {
+      font-size: 12px;
+      color: #000000;
+      text-align: right;
+      margin-top: 5px;
+    }
+    .chat-input {
+      display: flex;
+      padding: 15px;
+      background-color: #f5f5f5;
+      border-top: 1px solid #e0e0e0;
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 30px;
+      outline: none;
+    }
+    .send-button {
+      background-color: #4a8f40;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      margin-left: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .speech-button {
+      background-color: #4a8f40;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      margin-left: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .examples {
+      padding: 15px 20px;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+    }
+    .example-text {
+      color: #666;
+      font-style: italic;
+    }
+    #message-template, .comment {
+      display: none;
+    }
+    .comment-marker {
+      color: #888;
+      font-size: 12px;
+      font-style: italic;
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .loading-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #4a8f40;
+      border-radius: 50%;
+      margin: 0 3px;
+      animation: loading 1.4s infinite ease-in-out both;
+    }
+    .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes loading {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+    .sql-details {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #666;
+      border-top: 1px solid #eee;
+      padding-top: 5px;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>SmartKrishi AI</h1>
+      <div class="subtitle">Your intelligent farming companion for smarter agriculture</div>
+    </header>
+    
+    <div class="chat-container">
+      <div class="chat-header">
+        <h2>SmartKrishi Chat</h2>
+        <div class="status">
+          <div class="status-dot" id="status-dot"></div>
+          <span id="status-text">Connecting...</span>
+        </div>
+      </div>
+      
+      <div class="chat-messages" id="chat-messages">
+        <div class="message assistant">
+          <div class="message-content">
+            <p id="welcome-message">Hello! I'm your farming assistant. Ask me questions about your soil data or farming practices. I can provide information in Hindi or English.</p>
+          </div>
+          <div class="message-time" id="welcome-time">Today, 10:32 AM</div>
+        </div>
+        
+        <div class="examples">
+          <div class="example-text" id="examples-text">
+            Examples: "मेरी मिट्टी में नाइट्रोजन की मात्रा कितनी है?" or "What's the pH level of soil in my farm?"
+          </div>
+        </div>
+        
+        <!-- Template for messages (hidden) -->
+        <div id="message-template" class="message">
+          <div class="message-content"></div>
+          <div class="message-time"></div>
+        </div>
+        
+        <!-- Loading indicator (hidden by default) -->
+        <div id="loading-indicator" class="loading" style="display: none;">
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+        </div>
+      </div>
+      
+      <div class="chat-input">
+        <input type="text" id="user-input" placeholder="Type your farming question here...">
+        <button class="send-button" id="send-button">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="speech-button" id="speech-button">
+          🎤
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const chatMessages = document.getElementById('chat-messages');
+      const userInput = document.getElementById('user-input');
+      const sendButton = document.getElementById('send-button');
+      const speechButton = document.getElementById('speech-button');
+      const messageTemplate = document.getElementById('message-template');
+      const loadingIndicator = document.getElementById('loading-indicator');
+      const statusDot = document.getElementById('status-dot');
+      const statusText = document.getElementById('status-text');
+      
+      // API configuration
+      const API_URL = 'http://localhost:8000/api/chat'; // Update with your actual API URL
+      const USER_ID = 'user_' + Math.random().toString(36).substring(2, 9); // Generate a random user ID
+      
+      // Check API connection on page load
+      checkApiConnection();
+      
+      // Add event listeners
+      sendButton.addEventListener('click', handleUserMessage);
+      userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          handleUserMessage();
+        }
+      });
+      speechButton.addEventListener('click', startSpeechRecognition);
+      
+      // Check API connection
+      function checkApiConnection() {
+        fetch('http://localhost:8000/api/health')
+          .then(response => {
+            if (response.ok) {
+              setApiStatus(true);
+              return response.json();
+            } else {
+              setApiStatus(false);
+              throw new Error('API not responding');
+            }
+          })
+          .catch(error => {
+            console.error('API connection error:', error);
+            setApiStatus(false);
+          });
+      }
+      
+      function setApiStatus(isConnected) {
+        if (isConnected) {
+          statusDot.style.backgroundColor = '#8fce00'; // Green
+          statusText.textContent = 'Online';
+        } else {
+          statusDot.style.backgroundColor = '#ff4d4d'; // Red
+          statusText.textContent = 'Offline';
+          
+          // Add error message to chat
+          const messageElement = messageTemplate.cloneNode(true);
+          messageElement.removeAttribute('id');
+          messageElement.classList.add('assistant');
+          
+          const contentElement = messageElement.querySelector('.message-content');
+          contentElement.innerHTML = '<span class="error">⚠️ Unable to connect to the AI service. Please check your connection and try again later.</span>';
+          
+          const timeElement = messageElement.querySelector('.message-time');
+          timeElement.textContent = getCurrentTime();
+          
+          messageElement.style.display = 'block';
+          chatMessages.appendChild(messageElement);
+        }
+      }
+      
+      async function handleUserMessage() {
+        const userMessage = userInput.value.trim();
+        if (userMessage === '') return;
+        
+        // Add user message to chat
+        addMessage(userMessage, 'user');
+        userInput.value = '';
+        
+        // Show loading indicator
+        loadingIndicator.style.display = 'flex';
+        
+        try {
+          // Send message to API
+          const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              question: userMessage,
+              user_id: USER_ID
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error('API request failed');
+          }
+          
+          const data = await response.json();
+          
+          // Hide loading indicator
+          loadingIndicator.style.display = 'none';
+          
+          // Add AI response to chat
+          if (data.error) {
+            addMessage(`Error: ${data.error}`, 'assistant', true);
+          } else {
+            addMessage(data.response, 'assistant', false, data.sql_query, data.query_result);
+            readAloud(data.response);
+
+            // Read aloud the response if it's in Hindi and not empty
+            // if (isHindi(data.response) && data.response.trim() !== '') {
+            //   readAloud(data.response);
+            // }
+          }
+          
+        } catch (error) {
+          console.error('Error:', error);
+          loadingIndicator.style.display = 'none';
+          addMessage('Sorry, there was an error processing your request. Please try again.', 'assistant', true);
+        }
+      }
+      
+      function addMessage(text, sender, isError = false, sqlQuery = null, queryResult = null) {
+        // Clone the template
+        const messageElement = messageTemplate.cloneNode(true);
+        messageElement.removeAttribute('id');
+        messageElement.classList.add(sender);
+        
+        // Set the message content
+        const contentElement = messageElement.querySelector('.message-content');
+        
+        if (isError) {
+          contentElement.innerHTML = `<span class="error">${text}</span>`;
+        } else {
+          contentElement.textContent = text;
+          
+          // Add SQL details for assistant messages if available
+          if (sender === 'assistant' && sqlQuery) {
+            const sqlDetails = document.createElement('div');
+            sqlDetails.className = 'sql-details';
+            sqlDetails.innerHTML = `<strong>SQL Query:</strong> ${sqlQuery}`;
+            
+            if (queryResult) {
+              sqlDetails.innerHTML += `<br><strong>Result:</strong> ${queryResult}`;
+            }
+            
+            contentElement.appendChild(sqlDetails);
+          }
+        }
+        
+        // Set the time
+        const timeElement = messageElement.querySelector('.message-time');
+        timeElement.textContent = getCurrentTime();
+        
+        // Add to chat and show
+        messageElement.style.display = 'block';
+        chatMessages.appendChild(messageElement);
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+      
+      function getCurrentTime() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedHours = hours % 12 || 12;
+        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+        return `Today, ${formattedHours}:${formattedMinutes} ${ampm}`;
+      }
+
+      function isHindi(text) {
+        // Simple check for Hindi characters
+        return /[\u0900-\u097F]/.test(text);
+      }
+
+      function readAloud(text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'hi-IN'; // Set language to Hindi
+        utterance.onerror = function(event) {
+          console.error('Speech synthesis error:', event);
+        };
+
+        // Check if speech synthesis is available
+        if (!window.speechSynthesis) {
+          console.error('Speech synthesis not supported in this browser.');
+          return;
+        }
+        
+        // Cancel any ongoing speech before speaking the new utterance
+
+        if (window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
+        }
+
+        // Split the text into chunks if it's too long, ensuring not to cut off sentences
+        const chunkSize = 1000; // Increase chunk size to allow for longer segments
+        console.log('Reading aloud:', text); // Log the text being read
+
+
+        const chunks = text.split(/(?<=\S[.!?])\s+/); // Split by sentence boundaries
+
+        // const chunkUtterance = new SpeechSynthesisUtterance(text);
+        // chunkUtterance.lang = 'hi-IN';
+        // window.speechSynthesis.speak(chunkUtterance);
+        // window.speechSynthesis.speak(text);
+
+
+        // Speak each chunk with a delay
+        chunks.forEach((chunk, index) => {
+          setTimeout(() => {
+            const chunkUtterance = new SpeechSynthesisUtterance(chunk);
+            chunkUtterance.lang = 'hi-IN';
+            window.speechSynthesis.speak(chunkUtterance);
+          }, index * 1000); // Delay between chunks (1 second)
+        });
+      }
+
+      function startSpeechRecognition() {
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'hi-IN'; // Set language to Hindi
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.start();
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          userInput.value = transcript; // Populate input field with recognized text
+        };
+
+        recognition.onerror = (event) => {
+          console.error('Speech recognition error:', event.error);
+        };
+      }
+    });
+  </script>
+</body>
